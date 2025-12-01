@@ -22,25 +22,28 @@
         <span>首页概览</span>
       </el-menu-item>
 
-      <div class="menu-group-title">资源服务</div>
+      <!-- Public/User Resources (Hidden for Admin) -->
+      <template v-if="!isAdmin">
+        <div class="menu-group-title">资源服务</div>
 
-      <el-sub-menu index="/books">
-        <template #title>
-          <el-icon><Reading /></el-icon>
-          <span>图书资源</span>
-        </template>
-        <el-menu-item index="/books/search">图书查询</el-menu-item>
-        <el-menu-item index="/books/recommend">新书推荐</el-menu-item>
-      </el-sub-menu>
+        <el-sub-menu index="/books">
+          <template #title>
+            <el-icon><Reading /></el-icon>
+            <span>图书资源</span>
+          </template>
+          <el-menu-item index="/books/search">图书查询</el-menu-item>
+          <el-menu-item index="/books/recommend">新书推荐</el-menu-item>
+        </el-sub-menu>
 
-      <el-sub-menu index="/borrowing">
-        <template #title>
-          <el-icon><Notebook /></el-icon>
-          <span>我的借阅</span>
-        </template>
-        <el-menu-item index="/borrowing/current">当前借阅</el-menu-item>
-        <el-menu-item index="/borrowing/history">借阅历史</el-menu-item>
-      </el-sub-menu>
+        <el-sub-menu index="/borrowing">
+          <template #title>
+            <el-icon><Notebook /></el-icon>
+            <span>我的借阅</span>
+          </template>
+          <el-menu-item index="/borrowing/current">当前借阅</el-menu-item>
+          <el-menu-item index="/borrowing/history">借阅历史</el-menu-item>
+        </el-sub-menu>
+      </template>
 
       <div class="menu-group-title">个人中心</div>
 
