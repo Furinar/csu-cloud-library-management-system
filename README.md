@@ -12,7 +12,6 @@
 - **路由管理**: Vue Router 4
 - **状态管理**: Pinia
 - **HTTP 客户端**: Axios
-- **CSS 预处理器**: Sass
 
 ### 后端
 
@@ -24,7 +23,7 @@
 ### 部署与运维
 
 - **构建工具**: Maven 3
-- **接口测试**: Postman / Swagger
+- **接口测试**: apifox
 - **版本控制**: Git
 
 ## 2 项目结构
