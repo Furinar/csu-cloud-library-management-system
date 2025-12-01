@@ -40,8 +40,29 @@
           <el-input v-model="form.location" />
         </el-form-item>
         
-        <el-form-item label="封面URL" prop="cover">
-          <el-input v-model="form.cover" />
+        <el-form-item label="封面设置" prop="cover">
+          <el-radio-group v-model="coverType" style="margin-bottom: 10px;">
+            <el-radio label="url">图片链接</el-radio>
+            <el-radio label="upload">本地上传</el-radio>
+          </el-radio-group>
+          
+          <div v-if="coverType === 'url'" style="width: 100%">
+            <el-input v-model="form.cover" placeholder="请输入图片URL" />
+          </div>
+          
+          <div v-else style="width: 100%">
+            <el-upload
+              class="avatar-uploader"
+              action="#"
+              :show-file-list="false"
+              :auto-upload="false"
+              :on-change="handleFileChange"
+            >
+              <img v-if="form.cover && form.cover.startsWith('data:')" :src="form.cover" class="avatar" />
+              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            </el-upload>
+            <div class="el-upload__tip">支持 jpg/png 文件，大小不超过 2MB</div>
+          </div>
         </el-form-item>
         
         <el-form-item label="简介" prop="intro">
@@ -61,12 +82,15 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { getBookById } from '@/api/book';
+import { Plus } from '@element-plus/icons-vue';
+import type { UploadFile } from 'element-plus';
+import { getBookById, createBook, updateBook } from '@/api/book';
 
 const route = useRoute();
 const router = useRouter();
 const formRef = ref();
 const isEdit = computed(() => !!route.params.id);
+const coverType = ref('url');
 
 const form = reactive({
   title: '',
@@ -92,16 +116,52 @@ onMounted(async () => {
     const book = await getBookById(route.params.id as string);
     if (book) {
       Object.assign(form, book);
+      // If cover looks like a base64 string, switch to upload mode visually (optional, but url mode is safer default)
+      if (form.cover && form.cover.startsWith('data:')) {
+        coverType.value = 'upload';
+      }
     }
   }
 });
 
+const handleFileChange = (uploadFile: UploadFile) => {
+  if (!uploadFile.raw) return;
+  
+  const isImage = uploadFile.raw.type.startsWith('image/');
+  const isLt2M = uploadFile.raw.size / 1024 / 1024 < 2;
+
+  if (!isImage) {
+    ElMessage.error('上传头像图片只能是 JPG/PNG 格式!');
+    return;
+  }
+  if (!isLt2M) {
+    ElMessage.error('上传头像图片大小不能超过 2MB!');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.readAsDataURL(uploadFile.raw);
+  reader.onload = () => {
+    form.cover = reader.result as string;
+  };
+};
+
 const handleSubmit = async () => {
   if (!formRef.value) return;
-  await formRef.value.validate((valid: boolean) => {
+  await formRef.value.validate(async (valid: boolean) => {
     if (valid) {
-      ElMessage.success(isEdit.value ? '更新成功' : '创建成功');
-      router.push('/dashboard'); // Or book list
+      try {
+        if (isEdit.value) {
+          await updateBook(route.params.id as string, form);
+          ElMessage.success('更新成功');
+        } else {
+          await createBook(form);
+          ElMessage.success('创建成功');
+        }
+        router.push('/admin/books/list');
+      } catch (error) {
+        console.error(error);
+      }
     }
   });
 };
@@ -111,6 +171,40 @@ const handleSubmit = async () => {
 .book-form-container {
   max-width: 800px;
   margin: 0 auto;
+}
+
+.avatar-uploader {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  width: 178px;
+  height: 178px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: var(--el-transition-duration-fast);
+  
+  &:hover {
+    border-color: #409EFF;
+  }
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+  line-height: 178px;
+}
+
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+  object-fit: cover;
 }
 </style>
 
