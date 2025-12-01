@@ -83,6 +83,12 @@ const router = createRouter({
           meta: { roles: ['admin'], title: '用户管理' }
         },
         {
+          path: 'system/notification',
+          name: 'SystemNotification',
+          component: () => import('@/views/system/Notification.vue'),
+          meta: { roles: ['admin'], title: '消息推送' }
+        },
+        {
           path: 'system/logs',
           name: 'SystemLogs',
           component: () => import('@/views/system/logs/index.vue'),
