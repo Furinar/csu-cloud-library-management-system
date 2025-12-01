@@ -12,7 +12,6 @@
 - **路由管理**: Vue Router 4
 - **状态管理**: Pinia
 - **HTTP 客户端**: Axios
-- **CSS 预处理器**: Sass
 
 ### 后端
 
