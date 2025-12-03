@@ -80,7 +80,7 @@
 1. **获取代码**
 
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/Furinar/csu-cloud-library-management-system.git
    cd csu-cloud-library-management-system
    ```
 
