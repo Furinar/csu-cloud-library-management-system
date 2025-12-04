@@ -1,16 +1,13 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
 import { ElMessage } from 'element-plus';
 
-// Create axios instance
 const service = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: 'http://127.0.0.1:4523/m1/7376759-7108806-default',
   timeout: 10000,
 });
 
-// Check if we should use mock
-const USE_MOCK = false; // Disabled mock
+const USE_MOCK = false; 
 
-// Request interceptor
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem('token');
@@ -25,13 +22,10 @@ service.interceptors.request.use(
   }
 );
 
-// Response interceptor
 service.interceptors.response.use(
   (response: AxiosResponse) => {
-    // If response comes from mock adapter, it might be already formatted or raw axios response
     const res = response.data;
     
-    // Backend standard response structure: { code, msg, data }
     if (res.code !== 200) {
       ElMessage.error(res.msg || 'Error');
       return Promise.reject(new Error(res.msg || 'Error'));
