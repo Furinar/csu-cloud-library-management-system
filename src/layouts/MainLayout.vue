@@ -6,7 +6,7 @@
       <el-main>
         <router-view v-slot="{ Component }">
           <transition name="fade-transform" mode="out-in">
-            <component :is="Component" />
+            <component :is="Component" :key="route.fullPath" />
           </transition>
         </router-view>
       </el-main>
@@ -15,8 +15,11 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
 import Header from '@/components/Header.vue'
+
+const route = useRoute()
 </script>
 
 <style scoped lang="scss">
