@@ -19,6 +19,12 @@ const router = createRouter({
           name: 'Login',
           component: () => import('@/views/auth/Login.vue'),
           meta: { guest: true }
+        },
+        {
+          path: 'register',
+          name: 'Register',
+          component: () => import('@/views/auth/Register.vue'),
+          meta: { guest: true }
         }
       ]
     },
@@ -126,20 +132,22 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
-  // Ensure we rely on the store's state, but also double check localStorage as fallback
+  
   const token = authStore.token || localStorage.getItem('token')
   const isAuthenticated = !!token
   const userRole = authStore.user?.role
 
   if (to.meta.requiresAuth && !isAuthenticated) {
-    // Redirect to login if trying to access protected route without auth
     next('/auth/login')
   } else if (to.meta.guest && isAuthenticated) {
-    // Redirect to dashboard if already logged in and trying to access login page
     next('/dashboard')
-  } else if (to.meta.roles && Array.isArray(to.meta.roles) && userRole && !to.meta.roles.includes(userRole)) {
-    // Permission check
-    next('/dashboard')
+  } else if (to.meta.roles && Array.isArray(to.meta.roles) && userRole) {
+    const currentRole = userRole.toLowerCase();
+    if (!to.meta.roles.includes(currentRole)) {
+      next('/dashboard');
+    } else {
+      next();
+    }
   } else {
     next()
   }

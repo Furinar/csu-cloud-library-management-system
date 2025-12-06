@@ -58,7 +58,7 @@
     <div class="form-footer-wrapper">
       <div class="form-footer" v-if="activeRole === 'user'">
         <span>还没有账号？</span>
-        <el-link type="primary" :underline="false">立即注册</el-link>
+        <el-link type="primary" :underline="false" @click="$router.push('/auth/register')">立即注册</el-link>
       </div>
       <div class="form-footer-placeholder" v-else></div>
     </div>
