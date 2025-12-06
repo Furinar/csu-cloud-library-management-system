@@ -9,7 +9,23 @@
       
       <el-form :model="form" label-width="100px" ref="formRef" :rules="rules">
         <el-form-item label="头像">
-          <el-avatar :size="80" :src="form.avatar" />
+          <el-upload
+            class="avatar-uploader"
+            action="#"
+            :show-file-list="false"
+            :auto-upload="false"
+            :on-change="handleAvatarChange"
+            :before-upload="beforeAvatarUpload"
+          >
+            <div v-if="form.avatar" class="avatar-wrapper">
+              <el-avatar :size="80" :src="form.avatar" />
+              <div class="avatar-mask">
+                <el-icon><Plus /></el-icon>
+                <span>更换头像</span>
+              </div>
+            </div>
+            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+          </el-upload>
         </el-form-item>
         
         <el-form-item label="账号" prop="username">
@@ -47,6 +63,8 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
+import { Plus } from '@element-plus/icons-vue';
+import type { UploadProps, UploadFile } from 'element-plus';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
@@ -72,8 +90,39 @@ const rules = {
 onMounted(() => {
   if (authStore.user) {
     Object.assign(form, authStore.user);
+    // Ensure mock avatar if none exists
+    if (!form.avatar) {
+        form.avatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
+    }
   }
 });
+
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+    ElMessage.error('头像必须是 JPG 或 PNG 格式!');
+    return false;
+  }
+  if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error('头像大小不能超过 2MB!');
+    return false;
+  }
+  return true;
+};
+
+const handleAvatarChange = (uploadFile: UploadFile) => {
+  if (!uploadFile.raw) return;
+  
+  const isValid = beforeAvatarUpload(uploadFile.raw);
+  if (!isValid) return;
+
+  // Mock upload: read file as data URL
+  const reader = new FileReader();
+  reader.readAsDataURL(uploadFile.raw);
+  reader.onload = () => {
+    form.avatar = reader.result as string;
+    ElMessage.success('头像上传成功（模拟）');
+  };
+};
 
 const handleSave = async () => {
   saving.value = true;
@@ -83,7 +132,9 @@ const handleSave = async () => {
     // Update store if needed
     if (authStore.user) {
        authStore.user.name = form.name;
-       // ... others
+       authStore.user.phone = form.phone;
+       authStore.user.email = form.email;
+       // authStore.user.avatar = form.avatar; // Add avatar to user type if needed, or just assume it's there
     }
   } catch (error) {
     ElMessage.error('保存失败');
@@ -101,6 +152,74 @@ const handleSave = async () => {
   .profile-card {
     .card-header {
       font-weight: 600;
+    }
+  }
+  
+  .avatar-uploader {
+    display: inline-block;
+    
+    :deep(.el-upload) {
+      border: 1px dashed var(--el-border-color);
+      border-radius: 50%; // Circular upload area
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: var(--el-transition-duration-fast);
+      
+      &:hover {
+        border-color: var(--el-color-primary);
+      }
+    }
+    
+    .avatar-wrapper {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      
+      .el-avatar {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      
+      .avatar-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 12px;
+        
+        .el-icon {
+          font-size: 20px;
+          margin-bottom: 4px;
+        }
+      }
+      
+      &:hover .avatar-mask {
+        opacity: 1;
+      }
+    }
+    
+    .avatar-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 80px;
+      height: 80px;
+      text-align: center;
+      line-height: 80px;
+      border: 1px dashed #d9d9d9;
+      border-radius: 50%;
     }
   }
 }
