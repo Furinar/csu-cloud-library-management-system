@@ -1,0 +1,56 @@
+@use "./variables.scss" as *;
+
+:root {
+  --el-color-primary: #{$color-primary};
+  --el-color-primary-light-9: #{$color-primary-light};
+  --el-bg-color-page: #{$color-bg};
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Source Han Sans CN", "Microsoft YaHei", sans-serif;
+  background-color: $color-bg;
+  color: $color-text-main;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.el-button--primary {
+  --el-button-bg-color: #{$color-primary};
+  --el-button-border-color: #{$color-primary};
+  --el-button-hover-bg-color: #{$color-primary-dark};
+  --el-button-hover-border-color: #{$color-primary-dark};
+  --el-button-active-bg-color: #{$color-primary-dark};
+  --el-button-active-border-color: #{$color-primary-dark};
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c0c4cc;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.text-primary {
+  color: $color-primary;
+}
+.bg-white {
+  background-color: $color-white;
+}
+.common-card {
+  background: $color-white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+}
+
