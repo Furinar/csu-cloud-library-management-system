@@ -26,9 +26,9 @@ public interface IBorrowRecordService extends IService<BorrowRecord> {
 
     BorrowRecordVO confirmReturn(ReturnRequestDTO dto);
 
-    List<BorrowRecordVO> getCurrentBorrowRecords(Long currentPage, Long pageSize);
+    PageResponse<BorrowRecordVO> getCurrentBorrowRecords(Long currentPage, Long pageSize);
 
-    List<BorrowRecordVO> getHistoryBorrowRecords(Long currentPage, Long pageSize);
+    PageResponse<BorrowRecordVO> getHistoryBorrowRecords(Long currentPage, Long pageSize);
 
     void deleteHistoryRecords(HistoryRecordsDeleteDTO dto);
 

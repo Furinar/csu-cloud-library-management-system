@@ -65,6 +65,15 @@ public class BorrowRecordServiceImpl extends ServiceImpl<BorrowRecordMapper, Bor
             throw new BusinessException("保存借阅书籍失败，请重试");
         }
 
+        // 减少库存
+        Book book = bookMapper.selectById(bookId);
+        if (book != null && book.getAvailableStock() > 0) {
+            book.setAvailableStock(book.getAvailableStock() - 1);
+            bookMapper.updateById(book);
+        } else {
+            throw new BusinessException("库存不足，无法借阅");
+        }
+
         return borrowRecord2VO(borrowRecord,bookId);
     }
 
@@ -100,43 +109,58 @@ public class BorrowRecordServiceImpl extends ServiceImpl<BorrowRecordMapper, Bor
         }
         BorrowRecord borrowRecord = query().eq("id", Long.parseLong(dto.getBorrowRecordId())).one();
 
+        // 增加库存
+        Book book = bookMapper.selectById(borrowRecord.getBookId());
+        if (book != null) {
+            book.setAvailableStock(book.getAvailableStock() + 1);
+            bookMapper.updateById(book);
+        }
+
         return borrowRecord2VO(borrowRecord, borrowRecord.getBookId());
     }
 
     @Override
-    public List<BorrowRecordVO> getCurrentBorrowRecords(Long currentPage, Long pageSize) {
+    public PageResponse<BorrowRecordVO> getCurrentBorrowRecords(Long currentPage, Long pageSize) {
         Page<BorrowRecord> page = new Page<>(currentPage, pageSize);
+        Long userId = BaseContext.getCurrentId();
 
         List<BorrowRecord> borrowRecords = query()
+                .eq("user_id", userId)
                 .ne("status", "RETURNED")
                 .page(page)
                 .getRecords();
 
         if (borrowRecords == null || borrowRecords.isEmpty()) {
-            return Collections.emptyList();
+            return new PageResponse<>(currentPage, pageSize, Collections.emptyList(), 0L);
         }
 
-        return borrowRecords.stream()
+        List<BorrowRecordVO> vos = borrowRecords.stream()
                 .map(borrowRecord -> borrowRecord2VO(borrowRecord, borrowRecord.getBookId()))
                 .toList();
+        
+        return new PageResponse<>(currentPage, pageSize, vos, page.getTotal());
     }
 
     @Override
-    public List<BorrowRecordVO> getHistoryBorrowRecords(Long currentPage, Long pageSize) {
+    public PageResponse<BorrowRecordVO> getHistoryBorrowRecords(Long currentPage, Long pageSize) {
         Page<BorrowRecord> page = new Page<>(currentPage, pageSize);
+        Long userId = BaseContext.getCurrentId();
 
         List<BorrowRecord> borrowRecords = query()
+                .eq("user_id", userId)
                 .eq("status", "RETURNED")
                 .page(page)
                 .getRecords();
 
         if (borrowRecords == null || borrowRecords.isEmpty()) {
-            return Collections.emptyList();
+            return new PageResponse<>(currentPage, pageSize, Collections.emptyList(), 0L);
         }
 
-        return borrowRecords.stream()
+        List<BorrowRecordVO> vos = borrowRecords.stream()
                 .map(borrowRecord -> borrowRecord2VO(borrowRecord, borrowRecord.getBookId()))
                 .toList();
+
+        return new PageResponse<>(currentPage, pageSize, vos, page.getTotal());
     }
 
     @Override

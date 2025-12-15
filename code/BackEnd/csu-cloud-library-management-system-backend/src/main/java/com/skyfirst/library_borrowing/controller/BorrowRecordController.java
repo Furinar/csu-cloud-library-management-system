@@ -45,9 +45,9 @@ public class BorrowRecordController {
         if(currentPage == null || pageSize == null){
             throw new BusinessException("传入的当前页码或每页大小为空，请重新传入");
         }
-        List<BorrowRecordVO> vo = borrowRecordService.getCurrentBorrowRecords(currentPage, pageSize);
+        PageResponse<BorrowRecordVO> response = borrowRecordService.getCurrentBorrowRecords(currentPage, pageSize);
 
-        return ApiResponse.success(new PageResponse<>(currentPage, pageSize, vo));
+        return ApiResponse.success(response);
     }
 
     @GetMapping("/history")
@@ -55,9 +55,9 @@ public class BorrowRecordController {
         if(currentPage == null || pageSize == null){
             throw new BusinessException("传入的当前页码或每页大小为空，请重新传入");
         }
-        List<BorrowRecordVO> vo = borrowRecordService.getHistoryBorrowRecords(currentPage, pageSize);
+        PageResponse<BorrowRecordVO> response = borrowRecordService.getHistoryBorrowRecords(currentPage, pageSize);
 
-        return ApiResponse.success(new PageResponse<>(currentPage, pageSize, vo));
+        return ApiResponse.success(response);
     }
 
     @DeleteMapping("/history")

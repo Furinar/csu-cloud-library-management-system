@@ -113,12 +113,6 @@ const router = createRouter({
           meta: { roles: ['admin'], title: '消息管理' }
         },
         {
-          path: 'system/logs',
-          name: 'SystemLogs',
-          component: () => import('@/views/system/logs/index.vue'),
-          meta: { roles: ['admin'], title: '操作日志' }
-        },
-        {
           path: 'statistics',
           name: 'Statistics',
           component: () => import('@/views/statistics/index.vue'),
